@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Typelevel
+ * Copyright 2021 http4s.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ import org.scalajs.jsenv.selenium.SeleniumJSEnv
 
 import JSEnv._
 
-name := "bobcats"
+name := "http4s-crypto"
 
 ThisBuild / baseVersion := "0.1"
 
-// ThisBuild / organization := "org.typelevel"
-ThisBuild / organization := "com.armanbilge" // TODO remove
-ThisBuild / organizationName := "Typelevel"
+ThisBuild / organization := "org.http4s"
+ThisBuild / organizationName := "http4s.org"
 ThisBuild / publishGithubUser := "armanbilge"
 ThisBuild / publishFullName := "Arman Bilge"
 
@@ -36,10 +35,9 @@ enablePlugins(SonatypeCiReleasePlugin)
 ThisBuild / spiewakCiReleaseSnapshots := true
 ThisBuild / spiewakMainBranches := Seq("main")
 
-ThisBuild / homepage := Some(url("https://github.com/typelevel/bobcats"))
+ThisBuild / homepage := Some(url("https://github.com/http4s/http4s-crypto"))
 ThisBuild / scmInfo := Some(
-  ScmInfo(url("https://github.com/typelevel/bobcats"), "git@github.com:typelevel/bobcats.git"))
-sonatypeCredentialHost := "s01.oss.sonatype.org" // TODO remove
+  ScmInfo(url("https://github.com/http4s/http4s-crypto"), "https://github.com/http4s/http4s-crypto.git"))
 
 ThisBuild / crossScalaVersions := Seq("3.0.2", "2.12.15", "2.13.6")
 
@@ -89,15 +87,14 @@ val disciplineMUnitVersion = "1.0.9"
 lazy val root =
   project.in(file(".")).aggregate(rootJS, rootJVM).enablePlugins(NoPublishPlugin)
 lazy val rootJVM =
-  project.aggregate(core.jvm, testRuntime.jvm).enablePlugins(NoPublishPlugin)
+  project.aggregate(crypto.jvm, testRuntime.jvm).enablePlugins(NoPublishPlugin)
 lazy val rootJS =
-  project.aggregate(core.js, testRuntime.js).enablePlugins(NoPublishPlugin)
+  project.aggregate(crypto.js, testRuntime.js).enablePlugins(NoPublishPlugin)
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
-  .in(file("core"))
+lazy val crypto = crossProject(JSPlatform, JVMPlatform)
+  .in(file("crypto"))
   .settings(
-    name := "bobcats",
-    sonatypeCredentialHost := "s01.oss.sonatype.org", // TODO remove
+    name := "http4s-crypto",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core" % catsVersion,
       "org.scodec" %%% "scodec-bits" % scodecBitsVersion,
@@ -120,7 +117,7 @@ lazy val testRuntime = crossProject(JSPlatform, JVMPlatform)
   .in(file("test-runtime"))
   .enablePlugins(BuildInfoPlugin, NoPublishPlugin)
   .settings(
-    buildInfoPackage := "bobcats"
+    buildInfoPackage := "org.http4s.crypto"
   )
   .jvmSettings(
     buildInfoKeys := Seq(
