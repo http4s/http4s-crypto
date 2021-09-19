@@ -26,7 +26,7 @@ class HashSuite extends CatsEffectSuite {
 
   val data = ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
 
-  def testHash(algorithm: HashAlgorithm, expect: String) =
+  final def testHash(algorithm: HashAlgorithm, expect: String) =
     test(algorithm.toString) {
       assertIO(
         Hash[IO].digest(algorithm, data),
