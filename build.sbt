@@ -37,7 +37,9 @@ ThisBuild / spiewakMainBranches := Seq("main")
 
 ThisBuild / homepage := Some(url("https://github.com/http4s/http4s-crypto"))
 ThisBuild / scmInfo := Some(
-  ScmInfo(url("https://github.com/http4s/http4s-crypto"), "https://github.com/http4s/http4s-crypto.git"))
+  ScmInfo(
+    url("https://github.com/http4s/http4s-crypto"),
+    "https://github.com/http4s/http4s-crypto.git"))
 
 ThisBuild / crossScalaVersions := Seq("3.0.2", "2.12.15", "2.13.6")
 
