@@ -19,6 +19,7 @@ package org.http4s.crypto
 private[http4s] sealed trait Crypto[F[_]] {
   def hash: Hash[F]
   def hmac: Hmac[F]
+  def hmacKeyGen: HmacKeyGen[F]
 }
 
 private[crypto] trait UnsealedCrypto[F[_]] extends Crypto[F]

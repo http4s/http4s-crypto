@@ -16,7 +16,7 @@
 
 package org.http4s.crypto
 
-import cats.effect.kernel.Sync
+import cats.ApplicativeThrow
 import scodec.bits.ByteVector
 import javax.crypto
 
@@ -25,7 +25,7 @@ private[crypto] trait HmacPlatform[F[_]] {
 }
 
 private[crypto] trait HmacCompanionPlatform {
-  implicit def forSync[F[_]](implicit F: Sync[F]): Hmac[F] =
+  implicit def forApplicativeThrow[F[_]](implicit F: ApplicativeThrow[F]): Hmac[F] =
     new UnsealedHmac[F] {
 
       override def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
@@ -35,12 +35,6 @@ private[crypto] trait HmacCompanionPlatform {
           mac.init(sk)
           mac.update(data.toByteBuffer)
           ByteVector.view(mac.doFinal())
-        }
-
-      override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-        F.delay {
-          val key = crypto.KeyGenerator.getInstance(algorithm.toStringJava).generateKey()
-          SecretKeySpec(ByteVector.view(key.getEncoded()), algorithm)
         }
 
       override def importKey[A <: HmacAlgorithm](

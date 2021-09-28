@@ -20,7 +20,6 @@ import scodec.bits.ByteVector
 
 private[http4s] sealed trait Hmac[F[_]] extends HmacPlatform[F] {
   def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector]
-  def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]]
   def importKey[A <: HmacAlgorithm](key: ByteVector, algorithm: A): F[SecretKey[A]]
 }
 
