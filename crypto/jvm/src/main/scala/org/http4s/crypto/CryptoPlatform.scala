@@ -16,10 +16,10 @@
 
 package org.http4s.crypto
 
-import cats.MonadThrow
+import cats.effect.kernel.Sync
 
 private[crypto] trait CryptoCompanionPlatform {
-  implicit def forMonadThrow[F[_]: MonadThrow]: Crypto[F] =
+  implicit def forSync[F[_]: Sync]: Crypto[F] =
     new UnsealedCrypto[F] {
       override def hash: Hash[F] = Hash[F]
       override def hmac: Hmac[F] = Hmac[F]
