@@ -16,13 +16,14 @@
 
 package org.http4s.crypto
 
-import cats.effect.kernel.Sync
+private[http4s] sealed trait HmacKeyGen[F[_]] {
+  def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]]
+}
 
-private[crypto] trait CryptoCompanionPlatform {
-  implicit def forSync[F[_]: Sync]: Crypto[F] =
-    new UnsealedCrypto[F] {
-      override def hash: Hash[F] = Hash[F]
-      override def hmac: Hmac[F] = Hmac[F]
-      override def hmacKeyGen: HmacKeyGen[F] = HmacKeyGen[F]
-    }
+private[crypto] trait UnsealedHmacKeyGen[F[_]] extends HmacKeyGen[F]
+
+private[http4s] object HmacKeyGen extends HmacKeyGenCompanionPlatform {
+
+  def apply[F[_]](implicit hkg: HmacKeyGen[F]): hkg.type = hkg
+
 }

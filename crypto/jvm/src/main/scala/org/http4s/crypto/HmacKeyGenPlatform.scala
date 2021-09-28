@@ -17,12 +17,16 @@
 package org.http4s.crypto
 
 import cats.effect.kernel.Sync
+import scodec.bits.ByteVector
+import javax.crypto
 
-private[crypto] trait CryptoCompanionPlatform {
-  implicit def forSync[F[_]: Sync]: Crypto[F] =
-    new UnsealedCrypto[F] {
-      override def hash: Hash[F] = Hash[F]
-      override def hmac: Hmac[F] = Hmac[F]
-      override def hmacKeyGen: HmacKeyGen[F] = HmacKeyGen[F]
+private[crypto] trait HmacKeyGenCompanionPlatform {
+  implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
+    new UnsealedHmacKeyGen[F] {
+      override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
+        F.delay {
+          val key = crypto.KeyGenerator.getInstance(algorithm.toStringJava).generateKey()
+          SecretKeySpec(ByteVector.view(key.getEncoded()), algorithm)
+        }
     }
 }

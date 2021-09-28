@@ -43,7 +43,7 @@ class HmacSuite extends CatsEffectSuite {
 
   final def testGenerateKey(algorithm: HmacAlgorithm) =
     test(s"generate key for ${algorithm}") {
-      Hmac[IO].generateKey(algorithm).map {
+      HmacKeyGen[IO].generateKey(algorithm).map {
         case SecretKeySpec(key, keyAlgorithm) =>
           assertEquals(algorithm, keyAlgorithm)
           assert(key.size >= algorithm.minimumKeyLength)

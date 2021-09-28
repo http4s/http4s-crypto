@@ -16,21 +16,22 @@
 
 package org.http4s.crypto
 
+import cats.ApplicativeThrow
 import cats.effect.kernel.Async
 import cats.syntax.all._
 import scodec.bits.ByteVector
 
 import scala.scalajs.js
-import cats.effect.kernel.Sync
 
 private[crypto] trait HmacPlatform[F[_]]
 
 private[crypto] trait HmacCompanionPlatform {
-  implicit def forAsyncOrSync[F[_]](implicit F0: Priority[Async[F], Sync[F]]): Hmac[F] =
+  implicit def forAsyncOrApplicativeThrow[F[_]](
+      implicit F0: Priority[Async[F], ApplicativeThrow[F]]): Hmac[F] =
     if (facade.isNodeJSRuntime)
       new UnsealedHmac[F] {
         import facade.node._
-        implicit val F: Sync[F] = F0.join[Sync[F]]
+        implicit val F: ApplicativeThrow[F] = F0.join[ApplicativeThrow[F]]
 
         override def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
           key match {
@@ -41,27 +42,6 @@ private[crypto] trait HmacCompanionPlatform {
                 ByteVector.view(hmac.digest())
               }
             case _ => F.raiseError(new InvalidKeyException)
-          }
-
-        override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-          F0.fold { F =>
-            F.async_[SecretKey[A]] { cb =>
-              crypto.generateKey(
-                "hmac",
-                GenerateKeyOptions(algorithm.minimumKeyLength),
-                (err, key) =>
-                  cb(
-                    Option(err)
-                      .map(js.JavaScriptException)
-                      .toLeft(SecretKeySpec(ByteVector.view(key.`export`()), algorithm)))
-              )
-            }
-          } { F =>
-            F.delay {
-              val key =
-                crypto.generateKeySync("hmac", GenerateKeyOptions(algorithm.minimumKeyLength))
-              SecretKeySpec(ByteVector.view(key.`export`()), algorithm)
-            }
           }
 
         override def importKey[A <: HmacAlgorithm](
@@ -96,20 +76,6 @@ private[crypto] trait HmacCompanionPlatform {
                   } yield ByteVector.view(signature)
                 case _ => F.raiseError(new InvalidKeyException)
               }
-
-            override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-              for {
-                key <- F.fromPromise(
-                  F.delay(
-                    crypto
-                      .subtle
-                      .generateKey(
-                        HmacKeyGenParams(algorithm.toStringWebCrypto),
-                        true,
-                        js.Array("sign"))))
-                exported <- F.fromPromise(F.delay(crypto.subtle.exportKey("raw", key)))
-              } yield SecretKeySpec(ByteVector.view(exported), algorithm)
-
             override def importKey[A <: HmacAlgorithm](
                 key: ByteVector,
                 algorithm: A): F[SecretKey[A]] =

@@ -24,5 +24,6 @@ private[crypto] trait CryptoCompanionPlatform {
     new UnsealedCrypto[F] {
       override def hash: Hash[F] = Hash[F]
       override def hmac: Hmac[F] = Hmac[F]
+      override def hmacKeyGen: HmacKeyGen[F] = HmacKeyGen[F]
     }
 }
