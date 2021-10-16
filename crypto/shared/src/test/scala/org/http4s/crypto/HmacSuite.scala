@@ -25,7 +25,7 @@ import scodec.bits.ByteVector
 
 import scala.reflect.ClassTag
 
-class HmacSuite extends CatsEffectSuite {
+final class HmacSuite extends CatsEffectSuite {
 
   import HmacAlgorithm._
 

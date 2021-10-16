@@ -25,7 +25,7 @@ import scodec.bits.ByteVector
 
 import scala.reflect.ClassTag
 
-class HashSuite extends CatsEffectSuite {
+final class HashSuite extends CatsEffectSuite {
 
   import HashAlgorithm._
 
