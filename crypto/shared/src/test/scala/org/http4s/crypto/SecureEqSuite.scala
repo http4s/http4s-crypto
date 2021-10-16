@@ -21,7 +21,7 @@ import cats.kernel.laws.discipline.EqTests
 import scodec.bits.ByteVector
 import org.scalacheck.Arbitrary
 
-class SecureEqSuite extends DisciplineSuite {
+final class SecureEqSuite extends DisciplineSuite {
 
   implicit val arbitraryByteVector: Arbitrary[ByteVector] = Arbitrary(
     Arbitrary.arbitrary[Vector[Byte]].map(ByteVector(_)))

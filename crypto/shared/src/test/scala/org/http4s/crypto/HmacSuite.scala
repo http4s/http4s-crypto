@@ -16,41 +16,63 @@
 
 package org.http4s.crypto
 
-import munit.CatsEffectSuite
+import cats.Functor
 import cats.effect.IO
+import cats.effect.SyncIO
+import cats.syntax.all._
+import munit.CatsEffectSuite
 import scodec.bits.ByteVector
 
-class HmacSuite extends CatsEffectSuite {
+import scala.reflect.ClassTag
+
+final class HmacSuite extends CatsEffectSuite {
 
   import HmacAlgorithm._
 
   val key = ByteVector.encodeAscii("key").toOption.get
   val data = ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
 
-  final def testHash(algorithm: HmacAlgorithm, expect: String) =
-    test(algorithm.toString) {
-      assertIO(
-        Hmac[IO].digest(SecretKeySpec(key, algorithm), data),
-        ByteVector.fromHex(expect).get
-      )
+  def testHmac[F[_]: Hmac: Functor](algorithm: HmacAlgorithm, expect: String)(
+      implicit ct: ClassTag[F[_]]) =
+    test(s"$algorithm with ${ct.runtimeClass.getSimpleName()}") {
+      Hmac[F].digest(SecretKeySpec(key, algorithm), data).map { obtained =>
+        assertEquals(
+          obtained,
+          ByteVector.fromHex(expect).get
+        )
+      }
     }
 
-  testHash(SHA1, "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9")
-  testHash(SHA256, "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8")
-  testHash(
-    SHA512,
-    "b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a")
+  def tests[F[_]: Hmac: Functor](implicit ct: ClassTag[F[_]]) = {
+    testHmac[F](SHA1, "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9")
+    testHmac[F](SHA256, "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8")
+    testHmac[F](
+      SHA512,
+      "b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a")
+  }
 
-  final def testGenerateKey(algorithm: HmacAlgorithm) =
-    test(s"generate key for ${algorithm}") {
-      HmacKeyGen[IO].generateKey(algorithm).map {
+  def testGenerateKey[F[_]: Functor: HmacKeyGen](algorithm: HmacAlgorithm)(
+      implicit ct: ClassTag[F[_]]) =
+    test(s"generate key for ${algorithm} with ${ct.runtimeClass.getSimpleName()}") {
+      HmacKeyGen[F].generateKey(algorithm).map {
         case SecretKeySpec(key, keyAlgorithm) =>
           assertEquals(algorithm, keyAlgorithm)
           assert(key.size >= algorithm.minimumKeyLength)
       }
     }
 
-  if (BuildInfo.runtime != "NodeJS") // Disabled until testing against Node 16
-    List(SHA1, SHA256, SHA512).foreach(testGenerateKey)
+  if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
+    tests[SyncIO]
+
+  if (BuildInfo.runtime != "JVM")
+    tests[IO]
+
+  if (BuildInfo.runtime == "JVM")
+    List(SHA1, SHA256, SHA512).foreach(testGenerateKey[SyncIO])
+
+  if (!Set("JVM", "NodeJS").contains(
+      BuildInfo.runtime
+    )) // Disabled until testing against Node 16
+    List(SHA1, SHA256, SHA512).foreach(testGenerateKey[IO])
 
 }
