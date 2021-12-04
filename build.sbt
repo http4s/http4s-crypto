@@ -43,6 +43,8 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / crossScalaVersions := Seq("3.1.0", "2.12.15", "2.13.7")
 
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
+
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v2.4.0"),
