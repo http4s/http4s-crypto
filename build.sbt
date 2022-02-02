@@ -41,7 +41,7 @@ ThisBuild / scmInfo := Some(
     url("https://github.com/http4s/http4s-crypto"),
     "https://github.com/http4s/http4s-crypto.git"))
 
-ThisBuild / crossScalaVersions := Seq("3.1.0", "2.12.15", "2.13.8")
+ThisBuild / crossScalaVersions := Seq("3.1.1", "2.12.15", "2.13.8")
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
 
