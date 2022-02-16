@@ -24,42 +24,39 @@ import JSEnv._
 
 name := "http4s-crypto"
 
-ThisBuild / baseVersion := "0.2"
+ThisBuild / tlBaseVersion := "0.2"
+ThisBuild / tlUntaggedAreSnapshots := false
 
-ThisBuild / organization := "org.http4s"
-ThisBuild / organizationName := "http4s.org"
-ThisBuild / publishGithubUser := "armanbilge"
-ThisBuild / publishFullName := "Arman Bilge"
-
-enablePlugins(SonatypeCiReleasePlugin)
-ThisBuild / spiewakCiReleaseSnapshots := true
-ThisBuild / spiewakMainBranches := Seq("main")
-
-ThisBuild / homepage := Some(url("https://github.com/http4s/http4s-crypto"))
-ThisBuild / scmInfo := Some(
-  ScmInfo(
-    url("https://github.com/http4s/http4s-crypto"),
-    "https://github.com/http4s/http4s-crypto.git"))
+ThisBuild / developers := List(
+  tlGitHubDev("armanbilge", "Arman Bilge")
+)
+ThisBuild / startYear := Some(2021)
 
 ThisBuild / crossScalaVersions := Seq("3.1.1", "2.12.15", "2.13.8")
-
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v2.4.0"),
     name = Some("Setup NodeJS v14 LTS"),
-    params = Map("node-version" -> "14")
+    params = Map("node-version" -> "14"),
+    cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
   )
 )
 
-replaceCommandAlias("ci", CI.AllCIs.map(_.toString).mkString)
-addCommandAlias("ciJVM", CI.JVM.toString)
-addCommandAlias("ciNodeJS", CI.NodeJS.toString)
-addCommandAlias("ciFirefox", CI.Firefox.toString)
-addCommandAlias("ciChrome", CI.Chrome.toString)
-
-addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/headerCreate")
+val jsenvs = List(NodeJS, Chrome, Firefox).map(_.toString)
+ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
+ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    scala <- (ThisBuild / crossScalaVersions).value.init
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("scala" -> scala, "jsenv" -> jsenv))
+}
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("project" -> "rootJVM", "jsenv" -> jsenv))
+}
 
 lazy val useJSEnv =
   settingKey[JSEnv]("Use Node.js or a headless browser for running Scala.js tests")
@@ -88,12 +85,7 @@ val munitVersion = "0.7.29"
 val munitCEVersion = "1.0.7"
 val disciplineMUnitVersion = "1.0.9"
 
-lazy val root =
-  project.in(file(".")).aggregate(rootJS, rootJVM).enablePlugins(NoPublishPlugin)
-lazy val rootJVM =
-  project.aggregate(crypto.jvm, testRuntime.jvm).enablePlugins(NoPublishPlugin)
-lazy val rootJS =
-  project.aggregate(crypto.js, testRuntime.js).enablePlugins(NoPublishPlugin)
+lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
 
 lazy val crypto = crossProject(JSPlatform, JVMPlatform)
   .in(file("crypto"))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 http4s.org
+ * Copyright 2021 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package org.http4s.crypto.facade.node
+package org.http4s.crypto
 
-import scala.scalajs.js
-import scala.annotation.nowarn
+import scodec.bits.ByteVector
 
-@js.native
-@nowarn("msg=never used")
-private[crypto] trait Hmac extends js.Any {
+private[crypto] trait SecureEqCompanionPlatform { this: SecureEq.type =>
 
-  def digest(): js.typedarray.Uint8Array = js.native
-
-  def update(data: js.typedarray.Uint8Array): Unit = js.native
+  implicit val secureEqForByteVector: SecureEq[ByteVector] = new ByteVectorSecureEq
 
 }

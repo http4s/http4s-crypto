@@ -21,7 +21,7 @@ import scala.scalajs.js
 
 // https://nodejs.org/api/crypto.html
 @js.native
-@nowarn("cat=unused")
+@nowarn("msg=never used")
 private[crypto] trait crypto extends js.Any {
 
   def createHash(algorithm: String): Hash = js.native
@@ -44,6 +44,11 @@ private[crypto] trait crypto extends js.Any {
       size: Int,
       callback: js.UndefOr[js.Function2[js.Error, js.typedarray.Uint8Array, Unit]]): Unit =
     js.native
+
+  def timingSafeEqual(
+      a: js.typedarray.Uint8Array,
+      b: js.typedarray.Uint8Array
+  ): Boolean = js.native
 
 }
 
