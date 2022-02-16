@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package org.http4s.crypto.facade.node
+package org.http4s.crypto
 
-import scala.scalajs.js
-import scala.annotation.nowarn
+import scodec.bits.ByteVector
 
-@js.native
-@nowarn("msg=never used")
-private[crypto] trait Hmac extends js.Any {
+private[crypto] trait SecureEqCompanionPlatform { this: SecureEq.type =>
 
-  def digest(): js.typedarray.Uint8Array = js.native
-
-  def update(data: js.typedarray.Uint8Array): Unit = js.native
+  implicit val secureEqForByteVector: SecureEq[ByteVector] = new ByteVectorSecureEq
 
 }
