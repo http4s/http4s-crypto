@@ -16,11 +16,11 @@
 
 package org.http4s.crypto
 
-class GeneralSecurityException(message: String = null, cause: Throwable = null)
+private[http4s] class GeneralSecurityException(message: String = null, cause: Throwable = null)
     extends Exception(message, cause)
 
-class KeyException(message: String = null, cause: Throwable = null)
+private[http4s] class KeyException(message: String = null, cause: Throwable = null)
     extends GeneralSecurityException(message, cause)
 
-class InvalidKeyException(message: String = null, cause: Throwable = null)
+private[http4s] class InvalidKeyException(message: String = null, cause: Throwable = null)
     extends KeyException(message, cause)

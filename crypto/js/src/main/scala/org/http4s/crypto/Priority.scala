@@ -26,7 +26,7 @@ package org.http4s.crypto
  * This type can be useful for problems where multiple algorithms can be used, depending on the
  * type classes available.
  */
-sealed trait Priority[+P, +F] {
+private[http4s] sealed trait Priority[+P, +F] {
 
   import Priority.{Fallback, Preferred}
 
