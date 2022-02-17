@@ -25,7 +25,6 @@ import JSEnv._
 name := "http4s-crypto"
 
 ThisBuild / tlBaseVersion := "0.2"
-ThisBuild / tlUntaggedAreSnapshots := false
 
 ThisBuild / developers := List(
   tlGitHubDev("armanbilge", "Arman Bilge")
