@@ -26,12 +26,16 @@ import scala.scalajs.js
 private[crypto] trait HmacPlatform[F[_]]
 
 private[crypto] trait HmacCompanionPlatform {
-  implicit def forAsyncOrApplicativeThrow[F[_]](
+
+  @deprecated("Preserved for bincompat", "0.2.3")
+  def forAsyncOrApplicativeThrow[F[_]](
       implicit F0: Priority[Async[F], ApplicativeThrow[F]]): Hmac[F] =
+    forApplicativeThrow(F0.join)
+
+  implicit def forApplicativeThrow[F[_]](implicit F: ApplicativeThrow[F]): Hmac[F] =
     if (facade.isNodeJSRuntime)
       new UnsealedHmac[F] {
         import facade.node._
-        implicit val F: ApplicativeThrow[F] = F0.join[ApplicativeThrow[F]]
 
         override def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
           key match {
@@ -51,8 +55,11 @@ private[crypto] trait HmacCompanionPlatform {
 
       }
     else
-      F0.getPreferred
-        .map { implicit F: Async[F] =>
+      Some(F)
+        .collect { case f: Async[F] => f }
+        .fold(
+          throw new UnsupportedOperationException("Hmac[F] on browsers requires Async[F]")
+        ) { implicit F: Async[F] =>
           new UnsealedHmac[F] {
             import facade.browser._
             override def digest(
@@ -82,7 +89,4 @@ private[crypto] trait HmacCompanionPlatform {
               F.pure(SecretKeySpec(key, algorithm))
           }
         }
-        .getOrElse(throw new UnsupportedOperationException(
-          "Hmac[F] on browsers requires Async[F]"))
-
 }

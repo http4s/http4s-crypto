@@ -16,26 +16,33 @@
 
 package org.http4s.crypto
 
+import cats.ApplicativeThrow
 import cats.MonadThrow
 import cats.effect.kernel.Async
 import cats.syntax.all._
 import scodec.bits.ByteVector
 
 private[crypto] trait HashCompanionPlatform {
-  implicit def forAsyncOrMonadThrow[F[_]](
-      implicit F: Priority[Async[F], MonadThrow[F]]): Hash[F] =
+  @deprecated("Preserved for bincompat", "0.2.3")
+  def forAsyncOrMonadThrow[F[_]](implicit F: Priority[Async[F], MonadThrow[F]]): Hash[F] =
+    forApplicativeThrow(F.join)
+
+  implicit def forApplicativeThrow[F[_]](implicit F: ApplicativeThrow[F]): Hash[F] =
     if (facade.isNodeJSRuntime)
       new UnsealedHash[F] {
         override def digest(algorithm: HashAlgorithm, data: ByteVector): F[ByteVector] =
-          F.join[MonadThrow[F]].catchNonFatal {
+          F.catchNonFatal {
             val hash = facade.node.crypto.createHash(algorithm.toStringNodeJS)
             hash.update(data.toUint8Array)
             ByteVector.view(hash.digest())
           }
       }
     else
-      F.getPreferred
-        .map { implicit F: Async[F] =>
+      Some(F)
+        .collect { case f: Async[F] => f }
+        .fold(
+          throw new UnsupportedOperationException("Hash[F] on browsers requires Async[F]")
+        ) { implicit F: Async[F] =>
           new UnsealedHash[F] {
             import facade.browser._
             override def digest(algorithm: HashAlgorithm, data: ByteVector): F[ByteVector] =
@@ -44,7 +51,5 @@ private[crypto] trait HashCompanionPlatform {
                 .map(ByteVector.view)
           }
         }
-        .getOrElse(throw new UnsupportedOperationException(
-          "Hash[F] on browsers requires Async[F]"))
 
 }

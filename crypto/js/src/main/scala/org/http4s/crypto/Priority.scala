@@ -26,6 +26,7 @@ package org.http4s.crypto
  * This type can be useful for problems where multiple algorithms can be used, depending on the
  * type classes available.
  */
+@deprecated("Unneeded when P and F belong to the same hiearchy", "0.2.3")
 private[http4s] sealed trait Priority[+P, +F] {
 
   import Priority.{Fallback, Preferred}
@@ -70,11 +71,13 @@ private[http4s] object Priority extends FindPreferred {
 }
 
 private[crypto] trait FindPreferred extends FindFallback {
-  implicit def preferred[P](implicit ev: P): Priority[P, Nothing] =
+  @deprecated("Priority is deprecated", "0.2.3")
+  def preferred[P](implicit ev: P): Priority[P, Nothing] =
     Priority.Preferred(ev)
 }
 
 private[crypto] trait FindFallback {
-  implicit def fallback[F](implicit ev: F): Priority[Nothing, F] =
+  @deprecated("Priority is deprecated", "0.2.3")
+  def fallback[F](implicit ev: F): Priority[Nothing, F] =
     Priority.Fallback(ev)
 }
