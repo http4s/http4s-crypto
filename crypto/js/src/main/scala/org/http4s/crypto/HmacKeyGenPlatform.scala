@@ -37,13 +37,13 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
           Some(F)
             .collect { case f: Async[F] => f }
             .fold {
-              F.delay {
+              F.delay[SecretKey[A]] {
                 val key =
                   crypto.generateKeySync("hmac", GenerateKeyOptions(algorithm.minimumKeyLength))
                 SecretKeySpec(ByteVector.view(key.`export`()), algorithm)
               }
             } { F =>
-              F.async_ { cb =>
+              F.async_[SecretKey[A]] { cb =>
                 crypto.generateKey(
                   "hmac",
                   GenerateKeyOptions(algorithm.minimumKeyLength),
@@ -55,7 +55,6 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
                 )
               }
             }
-            .widen
 
       }
     else
