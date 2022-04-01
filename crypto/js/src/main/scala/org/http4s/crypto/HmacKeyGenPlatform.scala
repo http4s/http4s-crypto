@@ -24,36 +24,45 @@ import scodec.bits.ByteVector
 import scala.scalajs.js
 
 private[crypto] trait HmacKeyGenCompanionPlatform {
-  implicit def forAsyncOrSync[F[_]](implicit F0: Priority[Async[F], Sync[F]]): HmacKeyGen[F] =
+  @deprecated("Preserved for bincompat", "0.2.3")
+  def forAsyncOrSync[F[_]](implicit F0: Priority[Async[F], Sync[F]]): HmacKeyGen[F] =
+    forSync(F0.join)
+
+  implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
     if (facade.isNodeJSRuntime)
       new UnsealedHmacKeyGen[F] {
         import facade.node._
 
         override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-          F0.fold { F =>
-            F.async_[SecretKey[A]] { cb =>
-              crypto.generateKey(
-                "hmac",
-                GenerateKeyOptions(algorithm.minimumKeyLength),
-                (err, key) =>
-                  cb(
-                    Option(err)
-                      .map(js.JavaScriptException)
-                      .toLeft(SecretKeySpec(ByteVector.view(key.`export`()), algorithm)))
-              )
+          Some(F)
+            .collect { case f: Async[F] => f }
+            .fold {
+              F.delay[SecretKey[A]] {
+                val key =
+                  crypto.generateKeySync("hmac", GenerateKeyOptions(algorithm.minimumKeyLength))
+                SecretKeySpec(ByteVector.view(key.`export`()), algorithm)
+              }
+            } { F =>
+              F.async_[SecretKey[A]] { cb =>
+                crypto.generateKey(
+                  "hmac",
+                  GenerateKeyOptions(algorithm.minimumKeyLength),
+                  (err, key) =>
+                    cb(
+                      Option(err)
+                        .map(js.JavaScriptException)
+                        .toLeft(SecretKeySpec(ByteVector.view(key.`export`()), algorithm)))
+                )
+              }
             }
-          } { F =>
-            F.delay {
-              val key =
-                crypto.generateKeySync("hmac", GenerateKeyOptions(algorithm.minimumKeyLength))
-              SecretKeySpec(ByteVector.view(key.`export`()), algorithm)
-            }
-          }
 
       }
     else
-      F0.getPreferred
-        .map { implicit F: Async[F] =>
+      Some(F)
+        .collect { case f: Async[F] => f }
+        .fold(
+          throw new UnsupportedOperationException("HmacKeyGen[F] on browsers requires Async[F]")
+        ) { implicit F =>
           new UnsealedHmacKeyGen[F] {
             import facade.browser._
             override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
@@ -70,7 +79,5 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
               } yield SecretKeySpec(ByteVector.view(exported), algorithm)
           }
         }
-        .getOrElse(throw new UnsupportedOperationException(
-          "HmacKeyGen[F] on browsers requires Async[F]"))
 
 }

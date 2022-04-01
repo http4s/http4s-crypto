@@ -20,7 +20,12 @@ import cats.effect.kernel.Async
 import cats.effect.kernel.Sync
 
 private[crypto] trait CryptoCompanionPlatform {
-  implicit def forAsyncOrSync[F[_]](implicit F: Priority[Async[F], Sync[F]]): Crypto[F] =
+
+  @deprecated("Preserved for bincompat", "0.2.3")
+  def forAsyncOrSync[F[_]](implicit F: Priority[Async[F], Sync[F]]): Crypto[F] =
+    forSync(F.join)
+
+  implicit def forSync[F[_]](implicit F: Sync[F]): Crypto[F] =
     new UnsealedCrypto[F] {
       override def hash: Hash[F] = Hash[F]
       override def hmac: Hmac[F] = Hmac[F]
