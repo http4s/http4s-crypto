@@ -62,6 +62,7 @@ private[http4s] sealed trait Priority[+P, +F] {
     fold[Option[F]](_ => None)(f => Some(f))
 }
 
+@deprecated("Priority is deprecated", "0.2.3")
 private[http4s] object Priority extends FindPreferred {
 
   case class Preferred[P](get: P) extends Priority[P, Nothing]
