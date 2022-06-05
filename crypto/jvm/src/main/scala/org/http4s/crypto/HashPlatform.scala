@@ -18,6 +18,7 @@ package org.http4s.crypto
 
 import cats.ApplicativeThrow
 import scodec.bits.ByteVector
+
 import java.security.MessageDigest
 
 private[crypto] trait HashCompanionPlatform {

@@ -16,8 +16,8 @@
 
 package org.http4s.crypto.facade.node
 
-import scala.scalajs.js
 import scala.annotation.nowarn
+import scala.scalajs.js
 
 @js.native
 @nowarn("msg=never used")

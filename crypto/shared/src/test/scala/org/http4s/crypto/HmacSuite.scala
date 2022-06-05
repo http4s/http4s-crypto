@@ -29,11 +29,12 @@ final class HmacSuite extends CatsEffectSuite {
 
   import HmacAlgorithm._
 
-  val key = ByteVector.encodeAscii("key").toOption.get
-  val data = ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
+  val key: ByteVector = ByteVector.encodeAscii("key").toOption.get
+  val data: ByteVector =
+    ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
 
   def testHmac[F[_]: Hmac: Functor](algorithm: HmacAlgorithm, expect: String)(
-      implicit ct: ClassTag[F[Nothing]]) =
+      implicit ct: ClassTag[F[Nothing]]): Unit =
     test(s"$algorithm with ${ct.runtimeClass.getSimpleName()}") {
       Hmac[F].digest(SecretKeySpec(key, algorithm), data).map { obtained =>
         assertEquals(
@@ -43,7 +44,7 @@ final class HmacSuite extends CatsEffectSuite {
       }
     }
 
-  def tests[F[_]: Hmac: Functor](implicit ct: ClassTag[F[Nothing]]) = {
+  def tests[F[_]: Hmac: Functor](implicit ct: ClassTag[F[Nothing]]): Unit = {
     testHmac[F](SHA1, "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9")
     testHmac[F](SHA256, "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8")
     testHmac[F](
@@ -52,7 +53,7 @@ final class HmacSuite extends CatsEffectSuite {
   }
 
   def testGenerateKey[F[_]: Functor: HmacKeyGen](algorithm: HmacAlgorithm)(
-      implicit ct: ClassTag[F[Nothing]]) =
+      implicit ct: ClassTag[F[Nothing]]): Unit =
     test(s"generate key for ${algorithm} with ${ct.runtimeClass.getSimpleName()}") {
       HmacKeyGen[F].generateKey(algorithm).map {
         case SecretKeySpec(key, keyAlgorithm) =>

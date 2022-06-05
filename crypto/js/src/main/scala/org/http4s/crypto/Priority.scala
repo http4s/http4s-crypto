@@ -65,8 +65,10 @@ private[http4s] sealed trait Priority[+P, +F] {
 @deprecated("Priority is deprecated", "0.2.3")
 private[http4s] object Priority extends FindPreferred {
 
+  // scalafix:off
   case class Preferred[P](get: P) extends Priority[P, Nothing]
   case class Fallback[F](get: F) extends Priority[Nothing, F]
+  // scalafix:on
 
   def apply[P, F](implicit ev: Priority[P, F]): Priority[P, F] = ev
 }

@@ -18,6 +18,7 @@ package org.http4s.crypto
 
 import cats.ApplicativeThrow
 import scodec.bits.ByteVector
+
 import javax.crypto
 
 private[crypto] trait HmacPlatform[F[_]] {
