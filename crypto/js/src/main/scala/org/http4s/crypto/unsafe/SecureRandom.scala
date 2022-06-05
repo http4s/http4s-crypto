@@ -17,10 +17,10 @@
 package org.http4s.crypto.unsafe
 
 import org.http4s.crypto.facade
+import scodec.bits.ByteVector
 
 import java.util.Random
 import scala.scalajs.js
-import scodec.bits.ByteVector
 
 private[http4s] final class SecureRandom extends Random {
 

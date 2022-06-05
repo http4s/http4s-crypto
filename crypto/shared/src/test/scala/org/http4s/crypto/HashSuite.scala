@@ -29,10 +29,11 @@ final class HashSuite extends CatsEffectSuite {
 
   import HashAlgorithm._
 
-  val data = ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
+  val data: ByteVector =
+    ByteVector.encodeAscii("The quick brown fox jumps over the lazy dog").toOption.get
 
   def testHash[F[_]: Hash: Functor](algorithm: HashAlgorithm, expect: String)(
-      implicit ct: ClassTag[F[Nothing]]) =
+      implicit ct: ClassTag[F[Nothing]]): Unit =
     test(s"$algorithm with ${ct.runtimeClass.getSimpleName()}") {
       Hash[F].digest(algorithm, data).map { obtained =>
         assertEquals(
@@ -42,7 +43,7 @@ final class HashSuite extends CatsEffectSuite {
       }
     }
 
-  def tests[F[_]: Hash: Functor](implicit ct: ClassTag[F[Nothing]]) = {
+  def tests[F[_]: Hash: Functor](implicit ct: ClassTag[F[Nothing]]): Unit = {
     if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
       testHash[F](MD5, "9e107d9d372bb6826bd81d3542a419d6")
     testHash[F](SHA1, "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12")

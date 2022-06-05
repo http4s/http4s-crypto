@@ -16,8 +16,8 @@
 
 package org.http4s.crypto
 
-import scala.util.Try
 import scala.scalajs.js
+import scala.util.Try
 
 package object facade {
 
