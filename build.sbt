@@ -104,6 +104,11 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
       "com.armanbilge" %%% "munit-cats-effect" % munitCEVersion % Test
     )
   )
+  .nativeSettings(
+    libraryDependencies ++= Seq(
+      "com.armanbilge" %%% "cats-effect" % catsEffectVersion
+    )
+  )
   .dependsOn(testRuntime % Test)
 
 lazy val testRuntime = crossProject(JSPlatform, JVMPlatform, NativePlatform)

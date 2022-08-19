@@ -17,14 +17,18 @@
 package org.http4s.crypto
 
 import cats.effect.kernel.Sync
+import cats.effect.std.SecureRandom
+import cats.effect.SyncIO
+import cats.syntax.all._
 import scodec.bits.ByteVector
 
 private[crypto] trait HmacKeyGenCompanionPlatform {
   implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
     new UnsealedHmacKeyGen[F] {
+      private val random = SecureRandom.javaSecuritySecureRandom[SyncIO].unsafeRunSync()
       def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-        F.delay {
-          ???
+        random.nextBytes(algorithm.minimumKeyLength).to[F].map { bytes =>
+          SecretKeySpec(ByteVector.view(bytes), algorithm)
         }
     }
 }
