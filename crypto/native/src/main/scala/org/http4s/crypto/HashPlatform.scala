@@ -27,7 +27,6 @@ private[crypto] trait HashCompanionPlatform {
     new UnsealedHash[F] {
       def digest(algorithm: HashAlgorithm, data: ByteVector): F[ByteVector] =
         Zone { implicit z =>
-          
           import HashAlgorithm._
 
           val name = algorithm match {
@@ -44,7 +43,9 @@ private[crypto] trait HashCompanionPlatform {
           val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
           val size = stackalloc[CUnsignedInt]()
 
-          if (openssl.evp.EVP_Digest(data.toPtr, data.size.toULong, md, size, `type`, null) == 1)
+          if (openssl
+              .evp
+              .EVP_Digest(data.toPtr, data.size.toULong, md, size, `type`, null) == 1)
             F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!size).toLong))
           else
             F.raiseError(new RuntimeException("EVP_DIGEST"))

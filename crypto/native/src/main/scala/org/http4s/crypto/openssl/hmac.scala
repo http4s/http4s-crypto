@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package org.http4s.crypto
+package org.http4s.crypto.openssl
 
-import cats.effect.kernel.Sync
-import scodec.bits.ByteVector
+import scala.annotation.nowarn
+import scala.scalanative.unsafe._
 
-private[crypto] trait HmacKeyGenCompanionPlatform {
-  implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
-    new UnsealedHmacKeyGen[F] {
-      def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-        F.delay {
-          ???
-        }
-    }
+@link("crypto")
+@extern
+@nowarn
+private[crypto] object hmac {
+
+  def HMAC(
+      evp_md: Ptr[Byte],
+      key: Ptr[Byte],
+      key_len: Int,
+      d: Ptr[CUnsignedChar],
+      n: CSize,
+      md: Ptr[CUnsignedChar],
+      md_len: Ptr[CUnsignedInt]
+  ): Ptr[CUnsignedChar] = extern
+
 }

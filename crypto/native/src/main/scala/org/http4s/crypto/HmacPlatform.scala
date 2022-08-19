@@ -19,37 +19,50 @@ package org.http4s.crypto
 import cats.ApplicativeThrow
 import scodec.bits.ByteVector
 
-import javax.crypto
+import scala.scalanative.unsafe._
+import scala.scalanative.unsigned._
 
-private[crypto] trait HmacPlatform[F[_]] {
-  def importJavaKey(key: crypto.SecretKey): F[SecretKey[HmacAlgorithm]]
-}
+private[crypto] trait HmacPlatform[F[_]]
 
 private[crypto] trait HmacCompanionPlatform {
   implicit def forApplicativeThrow[F[_]](implicit F: ApplicativeThrow[F]): Hmac[F] =
     new UnsealedHmac[F] {
 
-      override def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
-        F.catchNonFatal {
-          val mac = crypto.Mac.getInstance(key.algorithm.toStringJava)
-          // val sk = key.toJava
-          // mac.init(sk)
-          mac.update(data.toByteBuffer)
-          ByteVector.view(mac.doFinal())
+      def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
+        Zone { implicit z =>
+          import HmacAlgorithm._
+
+          val SecretKeySpec(keyBytes, algorithm) = key
+
+          val name = algorithm match {
+            case SHA1 => c"SHA1"
+            case SHA256 => c"SHA256"
+            case SHA512 => c"SHA512"
+          }
+
+          val evpMd = openssl.evp.EVP_get_digestbyname(name)
+          if (evpMd == null)
+            F.raiseError(new RuntimeException("EVP_get_digestbyname"))
+
+          val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
+          val mdLen = stackalloc[CUnsignedInt]()
+
+          if (openssl
+              .hmac
+              .HMAC(
+                evpMd,
+                keyBytes.toPtr,
+                keyBytes.size.toInt,
+                data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
+                data.size.toULong,
+                md,
+                mdLen) != null)
+            F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
+          else
+            F.raiseError(new RuntimeException("HMAC"))
         }
 
-      override def importKey[A <: HmacAlgorithm](
-          key: ByteVector,
-          algorithm: A): F[SecretKey[A]] =
+      def importKey[A <: HmacAlgorithm](key: ByteVector, algorithm: A): F[SecretKey[A]] =
         F.pure(SecretKeySpec(key, algorithm))
-
-      override def importJavaKey(key: crypto.SecretKey): F[SecretKey[HmacAlgorithm]] =
-        F.fromOption(
-          for {
-            algorithm <- HmacAlgorithm.fromStringJava(key.getAlgorithm())
-            key <- Option(key.getEncoded())
-          } yield SecretKeySpec(ByteVector.view(key), algorithm),
-          new InvalidKeyException
-        )
     }
 }
