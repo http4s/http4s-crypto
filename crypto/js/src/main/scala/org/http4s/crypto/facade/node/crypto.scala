@@ -55,3 +55,5 @@ private[crypto] trait crypto extends js.Any {
 private[crypto] trait GenerateKeyOptions extends js.Object {
   val length: Int
 }
+
+private[crypto] object GenerateKeyOptions
