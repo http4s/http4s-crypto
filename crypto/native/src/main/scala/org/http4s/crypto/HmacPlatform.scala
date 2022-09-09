@@ -43,23 +43,24 @@ private[crypto] trait HmacCompanionPlatform {
           val evpMd = openssl.evp.EVP_get_digestbyname(name)
           if (evpMd == null)
             F.raiseError(new RuntimeException("EVP_get_digestbyname"))
+          else {
+            val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
+            val mdLen = stackalloc[CUnsignedInt]()
 
-          val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
-          val mdLen = stackalloc[CUnsignedInt]()
-
-          if (openssl
-              .hmac
-              .HMAC(
-                evpMd,
-                keyBytes.toPtr,
-                keyBytes.size.toInt,
-                data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
-                data.size.toULong,
-                md,
-                mdLen) != null)
-            F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
-          else
-            F.raiseError(new RuntimeException("HMAC"))
+            if (openssl
+                .hmac
+                .HMAC(
+                  evpMd,
+                  keyBytes.toPtr,
+                  keyBytes.size.toInt,
+                  data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
+                  data.size.toULong,
+                  md,
+                  mdLen) != null)
+              F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
+            else
+              F.raiseError(new RuntimeException("HMAC"))
+          }
         }
 
       def importKey[A <: HmacAlgorithm](key: ByteVector, algorithm: A): F[SecretKey[A]] =
