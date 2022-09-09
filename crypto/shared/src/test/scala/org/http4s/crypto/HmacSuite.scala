@@ -58,22 +58,18 @@ final class HmacSuite extends CatsEffectSuite {
       HmacKeyGen[F].generateKey(algorithm).map {
         case SecretKeySpec(key, keyAlgorithm) =>
           assertEquals(algorithm, keyAlgorithm)
-          assert(key.size >= algorithm.minimumKeyLength)
+          assert(clue(key.size) >= clue(algorithm.minimumKeyLength))
       }
     }
 
   if (Set("JVM", "NodeJS", "Native").contains(BuildInfo.runtime))
     tests[SyncIO]
 
-  if (!Set("JVM", "Native").contains(BuildInfo.runtime))
-    tests[IO]
+  tests[IO]
 
-  if (Set("JVM", "Native").contains(BuildInfo.runtime))
+  if (Set("JVM", "Native", "NodeJS").contains(BuildInfo.runtime))
     List(SHA1, SHA256, SHA512).foreach(testGenerateKey[SyncIO])
 
-  if (!Set("JVM", "Native", "NodeJS").contains(
-      BuildInfo.runtime
-    )) // Disabled until testing against Node 16
-    List(SHA1, SHA256, SHA512).foreach(testGenerateKey[IO])
+  List(SHA1, SHA256, SHA512).foreach(testGenerateKey[IO])
 
 }

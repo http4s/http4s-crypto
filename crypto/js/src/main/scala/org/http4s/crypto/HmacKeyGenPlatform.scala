@@ -33,20 +33,23 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
       new UnsealedHmacKeyGen[F] {
         import facade.node._
 
-        override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
+        override def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] = {
+          val options = new GenerateKeyOptions {
+            val length = algorithm.minimumKeyLength * java.lang.Byte.SIZE
+          }
           Some(F)
             .collect { case f: Async[F] => f }
             .fold {
               F.delay[SecretKey[A]] {
                 val key =
-                  crypto.generateKeySync("hmac", GenerateKeyOptions(algorithm.minimumKeyLength))
+                  crypto.generateKeySync("hmac", options)
                 SecretKeySpec(ByteVector.view(key.`export`()), algorithm)
               }
             } { F =>
               F.async_[SecretKey[A]] { cb =>
                 crypto.generateKey(
                   "hmac",
-                  GenerateKeyOptions(algorithm.minimumKeyLength),
+                  options,
                   (err, key) =>
                     cb(
                       Option(err)
@@ -55,6 +58,7 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
                 )
               }
             }
+        }
 
       }
     else
