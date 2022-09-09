@@ -56,7 +56,6 @@ final class HashSuite extends CatsEffectSuite {
   if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
     tests[SyncIO]
 
-  if (BuildInfo.runtime != "JVM")
-    tests[IO]
+  tests[IO]
 
 }
