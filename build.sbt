@@ -79,13 +79,11 @@ ThisBuild / Test / jsEnv := {
 }
 
 val catsVersion = "2.8.0"
-val catsEffectVersion = "3.4-f28b163-SNAPSHOT"
+val catsEffectVersion = "3.3.14-1-5d11fe9"
 val scodecBitsVersion = "1.1.34"
 val munitVersion = "1.0.0-M6"
-val munitCEVersion = "2.0-4e051ab-SNAPSHOT"
+val munitCEVersion = "2.0-5e03bfc"
 val disciplineMUnitVersion = "2.0.0-M3"
-
-ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
 lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
 
@@ -95,13 +93,13 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     name := "http4s-crypto",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core" % catsVersion,
-      "com.armanbilge" %%% "cats-effect-kernel" % catsEffectVersion,
+      "org.typelevel" %%% "cats-effect-kernel" % catsEffectVersion,
       "org.scodec" %%% "scodec-bits" % scodecBitsVersion,
       "org.scalameta" %%% "munit" % munitVersion % Test,
       "org.typelevel" %%% "cats-laws" % catsVersion % Test,
-      "com.armanbilge" %%% "cats-effect" % catsEffectVersion % Test,
+      "org.typelevel" %%% "cats-effect" % catsEffectVersion % Test,
       "org.typelevel" %%% "discipline-munit" % disciplineMUnitVersion % Test,
-      "com.armanbilge" %%% "munit-cats-effect" % munitCEVersion % Test
+      "org.typelevel" %%% "munit-cats-effect" % munitCEVersion % Test
     )
   )
   .nativeSettings(
