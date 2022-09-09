@@ -52,9 +52,6 @@ private[crypto] trait crypto extends js.Any {
 
 }
 
-@js.native
-private[crypto] trait GenerateKeyOptions extends js.Any
-private[crypto] object GenerateKeyOptions {
-  def apply(length: Int): GenerateKeyOptions =
-    js.Dynamic.literal(length = length).asInstanceOf[GenerateKeyOptions]
+private[crypto] trait GenerateKeyOptions extends js.Object {
+  val length: Int
 }
