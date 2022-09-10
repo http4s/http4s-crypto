@@ -103,7 +103,8 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     )
   )
   .nativeSettings(
-    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap
+    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap,
+    unusedCompileDependenciesTest := {}
   )
   .dependsOn(testRuntime % Test)
 
