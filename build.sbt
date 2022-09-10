@@ -128,5 +128,6 @@ lazy val testRuntime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .nativeSettings(
     buildInfoKeys := Seq(
       BuildInfoKey("runtime" -> "Native")
-    )
+    ),
+    unusedCompileDependenciesTest := {}
   )
