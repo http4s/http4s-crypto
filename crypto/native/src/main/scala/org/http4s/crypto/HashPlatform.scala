@@ -38,7 +38,7 @@ private[crypto] trait HashCompanionPlatform {
 
           val `type` = openssl.evp.EVP_get_digestbyname(name)
           if (`type` == null)
-            F.raiseError(new RuntimeException("EVP_get_digestbyname"))
+            F.raiseError(new GeneralSecurityException("EVP_get_digestbyname"))
           else {
             val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
             val size = stackalloc[CUnsignedInt]()
@@ -48,7 +48,7 @@ private[crypto] trait HashCompanionPlatform {
                 .EVP_Digest(data.toPtr, data.size.toULong, md, size, `type`, null) == 1)
               F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!size).toLong))
             else
-              F.raiseError(new RuntimeException("EVP_DIGEST"))
+              F.raiseError(new GeneralSecurityException("EVP_DIGEST"))
           }
         }
 
