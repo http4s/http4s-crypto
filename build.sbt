@@ -103,9 +103,7 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     )
   )
   .nativeSettings(
-    libraryDependencies ++= Seq(
-      "com.armanbilge" %%% "cats-effect" % catsEffectVersion
-    )
+    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap
   )
   .dependsOn(testRuntime % Test)
 

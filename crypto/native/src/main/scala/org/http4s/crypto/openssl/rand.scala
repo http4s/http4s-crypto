@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package org.http4s.crypto
+package org.http4s.crypto.openssl
 
-import cats.effect.kernel.Sync
-import scodec.bits.ByteVector
-
+import scala.annotation.nowarn
 import scala.scalanative.unsafe._
 
-private[crypto] trait HmacKeyGenCompanionPlatform {
-  implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
-    new UnsealedHmacKeyGen[F] {
-      def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
-        F.delay {
-          val len = algorithm.minimumKeyLength
-          val buf = stackalloc[Byte](len.toLong)
-          if (openssl.rand.RAND_bytes(buf, len) != 1)
-            throw new GeneralSecurityException("RAND_bytes")
-          SecretKeySpec(ByteVector.fromPtr(buf, len.toLong), algorithm)
-        }
-    }
+@link("crypto")
+@extern
+@nowarn
+private[crypto] object rand {
+
+  def RAND_bytes(
+      buf: Ptr[CChar],
+      num: CInt
+  ): CInt = extern
+
 }
