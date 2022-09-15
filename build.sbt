@@ -79,10 +79,10 @@ ThisBuild / Test / jsEnv := {
 }
 
 val catsVersion = "2.8.0"
-val catsEffectVersion = "3.3.14-1-5d11fe9"
+val catsEffectVersion = "3.3.14"
 val scodecBitsVersion = "1.1.34"
 val munitVersion = "1.0.0-M6"
-val munitCEVersion = "2.0-5e03bfc"
+val munitCEVersion = "2.0.0-M3"
 val disciplineMUnitVersion = "2.0.0-M3"
 
 lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
