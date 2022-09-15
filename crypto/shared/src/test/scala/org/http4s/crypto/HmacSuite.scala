@@ -62,12 +62,12 @@ final class HmacSuite extends CatsEffectSuite {
       }
     }
 
-  if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
+  if (Set("JVM", "NodeJS", "Native").contains(BuildInfo.runtime))
     tests[SyncIO]
 
   tests[IO]
 
-  if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
+  if (Set("JVM", "Native", "NodeJS").contains(BuildInfo.runtime))
     List(SHA1, SHA256, SHA512).foreach(testGenerateKey[SyncIO])
 
   List(SHA1, SHA256, SHA512).foreach(testGenerateKey[IO])

@@ -54,7 +54,8 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   for {
     jsenv <- jsenvs.tail
-  } yield MatrixExclude(Map("project" -> "rootJVM", "jsenv" -> jsenv))
+    project <- List("rootJVM", "rootNative")
+  } yield MatrixExclude(Map("project" -> project, "jsenv" -> jsenv))
 }
 
 lazy val useJSEnv =
@@ -80,13 +81,13 @@ ThisBuild / Test / jsEnv := {
 val catsVersion = "2.8.0"
 val catsEffectVersion = "3.3.14"
 val scodecBitsVersion = "1.1.34"
-val munitVersion = "0.7.29"
-val munitCEVersion = "1.0.7"
-val disciplineMUnitVersion = "1.0.9"
+val munitVersion = "1.0.0-M6"
+val munitCEVersion = "2.0.0-M3"
+val disciplineMUnitVersion = "2.0.0-M3"
 
 lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
 
-lazy val crypto = crossProject(JSPlatform, JVMPlatform)
+lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("crypto"))
   .settings(
     name := "http4s-crypto",
@@ -98,12 +99,16 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform)
       "org.typelevel" %%% "cats-laws" % catsVersion % Test,
       "org.typelevel" %%% "cats-effect" % catsEffectVersion % Test,
       "org.typelevel" %%% "discipline-munit" % disciplineMUnitVersion % Test,
-      "org.typelevel" %%% "munit-cats-effect-3" % munitCEVersion % Test
+      "org.typelevel" %%% "munit-cats-effect" % munitCEVersion % Test
     )
+  )
+  .nativeSettings(
+    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap,
+    unusedCompileDependenciesTest := {}
   )
   .dependsOn(testRuntime % Test)
 
-lazy val testRuntime = crossProject(JSPlatform, JVMPlatform)
+lazy val testRuntime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("test-runtime"))
   .enablePlugins(BuildInfoPlugin, NoPublishPlugin)
@@ -119,4 +124,10 @@ lazy val testRuntime = crossProject(JSPlatform, JVMPlatform)
     buildInfoKeys := Seq(
       BuildInfoKey("runtime" -> useJSEnv.value.toString)
     )
+  )
+  .nativeSettings(
+    buildInfoKeys := Seq(
+      BuildInfoKey("runtime" -> "Native")
+    ),
+    unusedCompileDependenciesTest := {}
   )

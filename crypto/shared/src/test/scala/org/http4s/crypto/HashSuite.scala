@@ -44,7 +44,7 @@ final class HashSuite extends CatsEffectSuite {
     }
 
   def tests[F[_]: Hash: Functor](implicit ct: ClassTag[F[Nothing]]): Unit = {
-    if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
+    if (Set("JVM", "NodeJS", "Native").contains(BuildInfo.runtime))
       testHash[F](MD5, "9e107d9d372bb6826bd81d3542a419d6")
     testHash[F](SHA1, "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12")
     testHash[F](SHA256, "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592")
@@ -53,7 +53,7 @@ final class HashSuite extends CatsEffectSuite {
       "07e547d9586f6a73f73fbac0435ed76951218fb7d0c8d788a309d785436bbb642e93a252a954f23912547d1e8a3b5ed6e1bfd7097821233fa0538f3db854fee6")
   }
 
-  if (Set("JVM", "NodeJS").contains(BuildInfo.runtime))
+  if (Set("JVM", "NodeJS", "Native").contains(BuildInfo.runtime))
     tests[SyncIO]
 
   tests[IO]
