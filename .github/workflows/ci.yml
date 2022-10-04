@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        scala: [3.1.3, 2.12.17, 2.13.9]
+        scala: [3.1.3, 2.12.17, 2.13.8]
         java: [temurin@8, temurin@11, temurin@17]
         project: [rootJS, rootJVM, rootNative]
         jsenv: [NodeJS, Chrome, Firefox]
@@ -195,7 +195,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.9]
+        scala: [2.13.8]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -324,32 +324,32 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (2.13.9, NodeJS, rootJS)
+      - name: Download target directories (2.13.8, NodeJS, rootJS)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.9-NodeJS-rootJS
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.8-NodeJS-rootJS
 
-      - name: Inflate target directories (2.13.9, NodeJS, rootJS)
+      - name: Inflate target directories (2.13.8, NodeJS, rootJS)
         run: |
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (2.13.9, NodeJS, rootJVM)
+      - name: Download target directories (2.13.8, NodeJS, rootJVM)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.9-NodeJS-rootJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.8-NodeJS-rootJVM
 
-      - name: Inflate target directories (2.13.9, NodeJS, rootJVM)
+      - name: Inflate target directories (2.13.8, NodeJS, rootJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (2.13.9, NodeJS, rootNative)
+      - name: Download target directories (2.13.8, NodeJS, rootNative)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.9-NodeJS-rootNative
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.8-NodeJS-rootNative
 
-      - name: Inflate target directories (2.13.9, NodeJS, rootNative)
+      - name: Inflate target directories (2.13.8, NodeJS, rootNative)
         run: |
           tar xf targets.tar
           rm targets.tar
