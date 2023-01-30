@@ -31,7 +31,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2021)
 
-ThisBuild / crossScalaVersions := Seq("3.2.1", "2.12.17", "2.13.8")
+ThisBuild / crossScalaVersions := Seq("3.2.2", "2.12.17", "2.13.8")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
@@ -79,7 +79,7 @@ ThisBuild / Test / jsEnv := {
 }
 
 val catsVersion = "2.9.0"
-val catsEffectVersion = "3.4.4"
+val catsEffectVersion = "3.4.5"
 val scodecBitsVersion = "1.1.34"
 val munitVersion = "1.0.0-M7"
 val munitCEVersion = "2.0.0-M3"
