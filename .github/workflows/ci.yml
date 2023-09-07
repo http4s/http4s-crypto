@@ -29,14 +29,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        scala: [3.2.2, 2.12.17, 2.13.8]
+        scala: [3.3.1, 2.12.17, 2.13.8]
         java: [temurin@8, temurin@11, temurin@17]
         project: [rootJS, rootJVM, rootNative]
         jsenv: [NodeJS, Chrome, Firefox]
         exclude:
-          - scala: 3.2.2
+          - scala: 3.3.1
             java: temurin@11
-          - scala: 3.2.2
+          - scala: 3.3.1
             java: temurin@17
           - scala: 2.12.17
             java: temurin@11
@@ -50,9 +50,9 @@ jobs:
             java: temurin@11
           - project: rootNative
             java: temurin@17
-          - scala: 3.2.2
+          - scala: 3.3.1
             jsenv: Chrome
-          - scala: 3.2.2
+          - scala: 3.3.1
             jsenv: Firefox
           - scala: 2.12.17
             jsenv: Chrome
