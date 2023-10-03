@@ -31,13 +31,13 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2021)
 
-ThisBuild / crossScalaVersions := Seq("3.2.2", "2.12.17", "2.13.8")
+ThisBuild / crossScalaVersions := Seq("3.3.1", "2.12.18", "2.13.11")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v2.4.0"),
-    name = Some("Setup NodeJS v16 LTS"),
-    params = Map("node-version" -> "16"),
+    name = Some("Setup NodeJS v18 LTS"),
+    params = Map("node-version" -> "18"),
     cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
   )
 )
@@ -47,7 +47,7 @@ ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   for {
-    scala <- (ThisBuild / crossScalaVersions).value.init
+    scala <- List("2.12", "3")
     jsenv <- jsenvs.tail
   } yield MatrixExclude(Map("scala" -> scala, "jsenv" -> jsenv))
 }
@@ -78,10 +78,10 @@ ThisBuild / Test / jsEnv := {
   }
 }
 
-val catsVersion = "2.9.0"
-val catsEffectVersion = "3.4.11"
-val scodecBitsVersion = "1.1.34"
-val munitVersion = "1.0.0-M7"
+val catsVersion = "2.10.0"
+val catsEffectVersion = "3.5.2"
+val scodecBitsVersion = "1.1.37"
+val munitVersion = "1.0.0-M10"
 val munitCEVersion = "2.0.0-M3"
 val disciplineMUnitVersion = "2.0.0-M3"
 

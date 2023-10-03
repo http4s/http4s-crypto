@@ -16,11 +16,12 @@
 
 package org.http4s.crypto.facade.browser
 
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
+
 import scala.scalajs.js
 
 @js.native
-@nowarn("msg=never used")
+@nowarn212("msg=never used")
 private[crypto] trait SubtleCrypto extends js.Any {
 
   def digest(

@@ -16,11 +16,12 @@
 
 package org.http4s.crypto.facade.node
 
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
+
 import scala.scalajs.js
 
 @js.native
-@nowarn("msg=never used")
+@nowarn212("msg=never used")
 private[crypto] trait Hmac extends js.Any {
 
   def digest(): js.typedarray.Uint8Array = js.native

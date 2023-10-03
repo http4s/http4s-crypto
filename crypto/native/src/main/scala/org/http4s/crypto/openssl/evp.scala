@@ -16,12 +16,13 @@
 
 package org.http4s.crypto.openssl
 
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
+
 import scala.scalanative.unsafe._
 
 @link("crypto")
 @extern
-@nowarn
+@nowarn212
 private[crypto] object evp {
 
   final val EVP_MAX_MD_SIZE = 64

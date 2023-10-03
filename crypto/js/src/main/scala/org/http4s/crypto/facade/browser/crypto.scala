@@ -16,13 +16,14 @@
 
 package org.http4s.crypto.facade.browser
 
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
 @JSGlobal
-@nowarn("msg=never used")
+@nowarn212("msg=never used")
 private[crypto] object crypto extends js.Any {
 
   def subtle: SubtleCrypto = js.native

@@ -32,34 +32,35 @@ private[crypto] trait HmacCompanionPlatform {
         Zone { implicit z =>
           import HmacAlgorithm._
 
-          val SecretKeySpec(keyBytes, algorithm) = key
+          key match {
+            case SecretKeySpec(keyBytes, algorithm) =>
+              val name = algorithm match {
+                case SHA1 => c"SHA1"
+                case SHA256 => c"SHA256"
+                case SHA512 => c"SHA512"
+              }
 
-          val name = algorithm match {
-            case SHA1 => c"SHA1"
-            case SHA256 => c"SHA256"
-            case SHA512 => c"SHA512"
-          }
+              val evpMd = openssl.evp.EVP_get_digestbyname(name)
+              if (evpMd == null)
+                F.raiseError(new GeneralSecurityException("EVP_get_digestbyname"))
+              else {
+                val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
+                val mdLen = stackalloc[CUnsignedInt]()
 
-          val evpMd = openssl.evp.EVP_get_digestbyname(name)
-          if (evpMd == null)
-            F.raiseError(new GeneralSecurityException("EVP_get_digestbyname"))
-          else {
-            val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
-            val mdLen = stackalloc[CUnsignedInt]()
-
-            if (openssl
-                .hmac
-                .HMAC(
-                  evpMd,
-                  keyBytes.toPtr,
-                  keyBytes.size.toInt,
-                  data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
-                  data.size.toULong,
-                  md,
-                  mdLen) != null)
-              F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
-            else
-              F.raiseError(new GeneralSecurityException("HMAC"))
+                if (openssl
+                    .hmac
+                    .HMAC(
+                      evpMd,
+                      keyBytes.toPtr,
+                      keyBytes.size.toInt,
+                      data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
+                      data.size.toULong,
+                      md,
+                      mdLen) != null)
+                  F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
+                else
+                  F.raiseError(new GeneralSecurityException("HMAC"))
+              }
           }
         }
 
