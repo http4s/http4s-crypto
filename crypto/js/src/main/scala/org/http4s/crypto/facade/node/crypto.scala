@@ -16,12 +16,13 @@
 
 package org.http4s.crypto.facade.node
 
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
+
 import scala.scalajs.js
 
 // https://nodejs.org/api/crypto.html
 @js.native
-@nowarn("msg=never used")
+@nowarn212("msg=never used")
 private[crypto] trait crypto extends js.Any {
 
   def createHash(algorithm: String): Hash = js.native
