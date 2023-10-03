@@ -174,15 +174,15 @@ jobs:
         run: 'sbt ''project ${{ matrix.project }}'' ''++ ${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' unusedCompileDependenciesTest'
 
       - name: Make target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nolink')
         run: mkdir -p crypto/jvm/target target .js/target crypto/native/target .jvm/target .native/target test-runtime/.jvm/target crypto/js/target test-runtime/.js/target test-runtime/.native/target project/target
 
       - name: Compress target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nolink')
         run: tar cf targets.tar crypto/jvm/target target .js/target crypto/native/target .jvm/target .native/target test-runtime/.jvm/target crypto/js/target test-runtime/.js/target test-runtime/.native/target project/target
 
       - name: Upload target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nolink')
         uses: actions/upload-artifact@v3
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.jsenv }}-${{ matrix.project }}
@@ -191,7 +191,7 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nolink')
     strategy:
       matrix:
         os: [ubuntu-latest]

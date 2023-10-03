@@ -42,6 +42,8 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   )
 )
 
+ThisBuild / tlCiReleaseBranches += "nolink"
+
 val jsenvs = List(NodeJS, Chrome, Firefox).map(_.toString)
 ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
@@ -104,6 +106,7 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   )
   .nativeSettings(
     tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap,
+    Test / nativeConfig ~= { c => c.withLinkingOptions(c.linkingOptions :+ "-lcrypto") },
     unusedCompileDependenciesTest := {}
   )
   .dependsOn(testRuntime % Test)

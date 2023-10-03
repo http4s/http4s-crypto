@@ -19,7 +19,6 @@ package org.http4s.crypto.openssl
 import scala.annotation.nowarn
 import scala.scalanative.unsafe._
 
-@link("crypto")
 @extern
 @nowarn
 private[crypto] object rand {
