@@ -44,7 +44,7 @@ private[crypto] trait HmacCompanionPlatform {
               if (evpMd == null)
                 F.raiseError(new GeneralSecurityException("EVP_get_digestbyname"))
               else {
-                val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE)
+                val md = stackalloc[CUnsignedChar](openssl.evp.EVP_MAX_MD_SIZE.toUInt)
                 val mdLen = stackalloc[CUnsignedInt]()
 
                 if (openssl
