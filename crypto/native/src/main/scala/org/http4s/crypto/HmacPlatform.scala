@@ -29,7 +29,7 @@ private[crypto] trait HmacCompanionPlatform {
     new UnsealedHmac[F] {
 
       def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
-        Zone { implicit z =>
+        Zone.acquire { implicit z =>
           import HmacAlgorithm._
 
           key match {
