@@ -54,7 +54,7 @@ private[crypto] trait HmacCompanionPlatform {
                       keyBytes.toPtr,
                       keyBytes.size.toInt,
                       data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
-                      data.size.toULong,
+                      data.size.toCSize,
                       md,
                       mdLen) != null)
                   F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))

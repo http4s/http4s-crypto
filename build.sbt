@@ -78,12 +78,12 @@ ThisBuild / Test / jsEnv := {
   }
 }
 
-val catsVersion = "2.10.0"
-val catsEffectVersion = "3.5.2"
-val scodecBitsVersion = "1.1.38"
-val munitVersion = "1.0.0-M10"
-val munitCEVersion = "2.0.0-M3"
-val disciplineMUnitVersion = "2.0.0-M3"
+val catsVersion = "2.13.0"
+val catsEffectVersion = "3.7.0-RC1"
+val scodecBitsVersion = "1.2.4"
+val munitVersion = "1.1.0"
+val munitCEVersion = "2.2.0-RC1"
+val disciplineMUnitVersion = "2.0.0"
 
 lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
 
@@ -103,7 +103,7 @@ lazy val crypto = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     )
   )
   .nativeSettings(
-    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.2.4").toMap,
+    tlVersionIntroduced := List("2.12", "2.13", "3").map(_ -> "0.3.0").toMap,
     unusedCompileDependenciesTest := {}
   )
   .dependsOn(testRuntime % Test)

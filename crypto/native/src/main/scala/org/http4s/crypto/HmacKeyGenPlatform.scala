@@ -27,7 +27,7 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
       def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
         F.delay {
           val len = algorithm.minimumKeyLength
-          val buf = stackalloc[Byte](len.toLong)
+          val buf = stackalloc[Byte](len)
           if (openssl.rand.RAND_bytes(buf, len) != 1)
             throw new GeneralSecurityException("RAND_bytes")
           SecretKeySpec(ByteVector.fromPtr(buf, len.toLong), algorithm)

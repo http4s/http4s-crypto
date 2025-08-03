@@ -45,7 +45,7 @@ private[crypto] trait HashCompanionPlatform {
 
             if (openssl
                 .evp
-                .EVP_Digest(data.toPtr, data.size.toULong, md, size, `type`, null) == 1)
+                .EVP_Digest(data.toPtr, data.size.toUSize, md, size, `type`, null) == 1)
               F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!size).toLong))
             else
               F.raiseError(new GeneralSecurityException("EVP_DIGEST"))
