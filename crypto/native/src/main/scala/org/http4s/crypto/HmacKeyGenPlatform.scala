@@ -20,7 +20,6 @@ import cats.effect.kernel.Sync
 import scodec.bits.ByteVector
 
 import scala.scalanative.unsafe._
-import scala.scalanative.unsigned._
 
 private[crypto] trait HmacKeyGenCompanionPlatform {
   implicit def forSync[F[_]](implicit F: Sync[F]): HmacKeyGen[F] =
@@ -28,7 +27,7 @@ private[crypto] trait HmacKeyGenCompanionPlatform {
       def generateKey[A <: HmacAlgorithm](algorithm: A): F[SecretKey[A]] =
         F.delay {
           val len = algorithm.minimumKeyLength
-          val buf = stackalloc[Byte](len.toLong.toULong)
+          val buf = stackalloc[Byte](len)
           if (openssl.rand.RAND_bytes(buf, len) != 1)
             throw new GeneralSecurityException("RAND_bytes")
           SecretKeySpec(ByteVector.fromPtr(buf, len.toLong), algorithm)

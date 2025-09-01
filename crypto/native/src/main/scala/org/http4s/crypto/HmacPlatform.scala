@@ -29,7 +29,7 @@ private[crypto] trait HmacCompanionPlatform {
     new UnsealedHmac[F] {
 
       def digest(key: SecretKey[HmacAlgorithm], data: ByteVector): F[ByteVector] =
-        Zone { implicit z =>
+        Zone.acquire { implicit z =>
           import HmacAlgorithm._
 
           key match {
@@ -54,7 +54,7 @@ private[crypto] trait HmacCompanionPlatform {
                       keyBytes.toPtr,
                       keyBytes.size.toInt,
                       data.toPtr.asInstanceOf[Ptr[CUnsignedChar]],
-                      data.size.toULong,
+                      data.size.toCSize,
                       md,
                       mdLen) != null)
                   F.pure(ByteVector.fromPtr(md.asInstanceOf[Ptr[Byte]], (!mdLen).toLong))
