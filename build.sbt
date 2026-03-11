@@ -31,7 +31,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2021)
 
-ThisBuild / crossScalaVersions := Seq("3.3.6", "2.12.20", "2.13.16")
+ThisBuild / crossScalaVersions := Seq("3.3.7", "2.12.21", "2.13.18")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
@@ -79,10 +79,10 @@ ThisBuild / Test / jsEnv := {
 }
 
 val catsVersion = "2.13.0"
-val catsEffectVersion = "3.7.0-RC1"
+val catsEffectVersion = "3.7.0"
 val scodecBitsVersion = "1.2.4"
-val munitVersion = "1.1.0"
-val munitCEVersion = "2.2.0-RC1"
+val munitVersion = "1.2.4"
+val munitCEVersion = "2.2.0"
 val disciplineMUnitVersion = "2.0.0"
 
 lazy val root = tlCrossRootProject.aggregate(crypto, testRuntime)
