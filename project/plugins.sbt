@@ -2,5 +2,5 @@ libraryDependencies += "org.scala-js" %% "scalajs-env-selenium" % "1.1.1"
 
 addSbtPlugin("org.http4s" % "sbt-http4s-org" % "2.0.5")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.2")
-addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.1")
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.2")
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.10")
