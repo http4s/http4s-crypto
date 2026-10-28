@@ -31,7 +31,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2021)
 
-ThisBuild / crossScalaVersions := Seq("3.3.7", "2.12.21", "2.13.18")
+ThisBuild / crossScalaVersions := Seq("3.3.9", "2.12.21", "2.13.18")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
